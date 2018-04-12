@@ -15,7 +15,7 @@ import IfInterface from '@folio/stripes-components/lib/IfInterface';
 import Button from '@folio/stripes-components/lib/Button';
 import KeyValue from '@folio/stripes-components/lib/KeyValue';
 import LedgerPane from './LedgerPane';
-// import TableSortAndFilter from '../TableSortAndFilter';
+import TableSortAndFilter from '../TableSortAndFilter';
 import ConnectionListing from '../ConnectionListing';
 
 
@@ -117,7 +117,7 @@ class LedgerView extends Component {
           <Col xs={12}>
             <KeyValue label="Fiscal Year" value={this.getFiscalYears()} />
           </Col>
-          {/* <Col xs={12}>
+          <Col xs={12}>
             <this.connectedTableSortAndFilter
               resourceName="tableRecords"
               tableInitCountName="queryCustom.tableCount"
@@ -130,7 +130,7 @@ class LedgerView extends Component {
               parentResources={this.props.parentResources}
               parentMutator={this.props.parentMutator}
             />
-          </Col> */}
+          </Col>
           <Col xs={12}>
             {
               fundData &&
