@@ -147,7 +147,7 @@ class Budget extends Component {
     },
     fundID: {
       type: 'okapi',
-      records: 'funds',
+      records: 'funds', 
       path: 'fund',
       recordsRequired: 1,
       params: { 
@@ -174,7 +174,34 @@ class Budget extends Component {
           return cql;
         }
       }
-    }
+    },
+    tableQuery: {
+      initialValue: {
+        query: 'query=(id="*")',
+        filter: '',
+        sort: 'id',
+        sortBy: 'asc',
+        resultCount: INITIAL_RESULT_COUNT,
+      },
+    },
+    tableRecords: {
+      type: 'okapi',
+      records: 'transactions',
+      path: 'transaction',
+      recordsRequired: '%{tableQuery.resultCount}',
+      perRequest: RESULT_COUNT_INCREMENT,
+      params: {
+        query: (...args) => {
+          const data = args[2];
+          console.log(`${data.tableQuery.filter}`);
+          let newData = `${data.tableQuery.query} ${data.tableQuery.filter} sortby ${data.tableQuery.sort}`;
+          console.log(newData);
+          if(newData === 'undefined') return undefined;
+          let cql = `${newData}`;
+          return cql;
+        }
+      }
+    },
   });
   
   constructor(props) {

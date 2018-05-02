@@ -125,13 +125,6 @@ class TableSortAndFilter extends Component {
     )
   }
 
-  // isData = () => {
-  //   const { parentResources, resourceName } = this.props;
-  //   const data = (parentResources[resourceName] || {}).records || [];
-  //   if (!data || data.length === 0) return [];
-  //   return data;
-  // }
-
   resetColumn() {
     const defaultConfig = _.cloneDeep(this.props.visibleColumnsConfig);
     const loopFilter = defaultConfig.map(column => {
@@ -259,9 +252,7 @@ class TableSortAndFilter extends Component {
     } else {
       this.setState({ filters: loopFilters, showClearButton: false });
     }
-   
-    this.props.onUpdateFilter(loopFilters);
-    // this.createFilterQuery(loopFilters);
+    this.createFilterQuery(loopFilters);
   }
   
   createFilterQuery() {
@@ -305,8 +296,8 @@ class TableSortAndFilter extends Component {
     if (!_.isUndefined(this.props)) {
       if (!_.isNull(this.props.parentResources)) {
         const { parentResources, parentMutator } = this.props;
-        let num = parentResources.queryCustom.tableCount + RESULT_COUNT_INCREMENT;
-        parentMutator.queryCustom.update({tableCount: num});
+        let num = parentResources.tableQuery.tableCount + RESULT_COUNT_INCREMENT;
+        parentMutator.tableQuery.update({tableCount: num});
       }
     }
   }
@@ -317,8 +308,7 @@ class TableSortAndFilter extends Component {
       visibleColumns: this.resetColumn(),
       showClearButton: false
     }, function() {
-      this.props.onUpdateFilter();
-      // this.createFilterQuery();
+      this.createFilterQuery();
     });
   }
 
@@ -332,7 +322,8 @@ TableSortAndFilter.propTypes = {
   visibleColumnsConfig: PropTypes.array,
   formatter: PropTypes.object,
   onUpdateFilter: PropTypes.func,
-  columnMapping: PropTypes.object
+  columnMapping: PropTypes.object,
+  contentData: PropTypes.object.isRequired
 }
 
 export default TableSortAndFilter;

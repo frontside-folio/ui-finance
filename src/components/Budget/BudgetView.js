@@ -18,8 +18,6 @@ import craftLayerUrl from '@folio/stripes-components/util/craftLayerUrl';
 import BudgetPane from './BudgetPane';
 import transitionToParams from '@folio/stripes-components/util/transitionToParams';
 import TableSortAndFilter from '../TableSortAndFilter';
-import TableData from '../../Utils/TableData';
-
 
 class BudgetView extends Component {
   static propTypes = {
@@ -34,10 +32,10 @@ class BudgetView extends Component {
     this.state = {
       viewID: '',
       fundID: null,
-      fyID: null,
-      TableData:TableData
+      fyID: null
     };
     this.getData = this.getData.bind(this);
+    this.getTableData = this.getTableData.bind(this);
     this.getFiscalYears = this.getFiscalYears.bind(this);
     this.getFund = this.getFund.bind(this);
     this.onCloseTransaction = this.onCloseTransaction.bind(this);
@@ -47,11 +45,6 @@ class BudgetView extends Component {
     this.transitionToParams = transitionToParams.bind(this);
     this.openTransactionLayer = this.openTransactionLayer.bind(this);
     this.onUpdateFilter = this.onUpdateFilter.bind(this);
-    this.loopThroughFilter = this.loopThroughFilter.bind(this);
-  }
-
-  componentDidMount() {
-    this.setState({ TableData });
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -130,6 +123,7 @@ class BudgetView extends Component {
     
     const visibleColumnsConfig = [
       { 'title': "id", 'status': true, },
+      { 'title': "transaction_type", 'status': true, },
       { 'title': "allocated", 'status': true, },
       { 'title': "amount", 'status': true, },
       { 'title': "awaiting_payment", 'status': true, },
@@ -138,12 +132,11 @@ class BudgetView extends Component {
       { 'title': "note", 'status': true, },
       { 'title': "timestamp", 'status': true, },
       { 'title': "source_id", 'status': true, },
-      { 'title': "transaction_type", 'status': true, },
-      { 'title': "budget_id", 'status': true, },
     ];
 
     const columnMapping = {
       id: 'ID',
+      transaction_type: 'Transaction Type',
       allocated: 'Allocated',
       amount: 'Amount',
       awaiting_payment: 'Awaiting Payment',
@@ -152,8 +145,19 @@ class BudgetView extends Component {
       note: 'Note',
       timestamp: 'Timestamp',
       source_id: 'Source ID',
-      transaction_type: 'Transaction Type',
-      budget_id: 'Budget ID',
+    };
+
+    const formatter = {
+      id: data => _.get(data, ['allocated'], ''),
+      transaction_type: data => _.get('data', ['Transaction Type'], ''),
+      allocated: data => _.get(data, ['allocated'], ''),
+      amount: data => _.get('data', ['Amount'], ''),
+      awaiting_payment: data => _.get('data', ['Awaiting Payment'], ''),
+      encumbered: data => _.get('data', ['Encumbered'], ''),
+      expenditures: data => _.get('data', ['Expenditures'], ''),
+      note: data => _.get('data', ['Note'], ''),
+      timestamp: data => _.get('data', ['timestamp'], ''),
+      source_id: data => _.get('data', ['Source ID'], ''),
     };
 
     if (!initialValues) {
@@ -200,7 +204,7 @@ class BudgetView extends Component {
             filterConfig={filterConfig}
             onClose={this.onCloseTransaction}
             visibleColumnsConfig={visibleColumnsConfig}
-            contentData={this.state.TableData}
+            contentData={this.getTableData()}
             // formatter={formatter}
             columnMapping={columnMapping}
             onUpdateFilter={this.onUpdateFilter}
@@ -217,6 +221,14 @@ class BudgetView extends Component {
     const budget = (parentResources.records || {}).records || [];
     if (!budget || budget.length === 0 || !id) return null;
     return budget.find(u => u.id === id);
+  }
+
+
+  getTableData = () => {
+    const { parentResources } = this.props;
+    const data = (parentResources.tableRecords || {}).records || [];
+    if (!data || data.length === 0) return [];
+    return data;
   }
 
   getFiscalYears = () => {
