@@ -20,7 +20,6 @@ import makeQueryFunction from '@folio/stripes-components/util/makeQueryFunction'
 import { filters2cql, initialFilterState, onChangeFilter as commonChangeFilter } from '@folio/stripes-components/lib/FilterGroups';
 import transitionToParams from '@folio/stripes-components/util/transitionToParams';
 import removeQueryParam from '@folio/stripes-components/util/removeQueryParam';
-import TableData from './TableData';
 
 const RESULT_COUNT_INCREMENT = 30;
 
@@ -49,7 +48,6 @@ class TableSortAndFilter extends Component {
     this.renderFilterValues = this.renderFilterValues.bind(this);
     this.onChangeFilterChk = this.onChangeFilterChk.bind(this);
     this.createFilterQuery = this.createFilterQuery.bind(this);
-    this.isData = this.isData.bind(this);
     this.setWrapperRef = this.setWrapperRef.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
     this.onNeedMore = this.onNeedMore.bind(this);
@@ -75,7 +73,7 @@ class TableSortAndFilter extends Component {
     const { parentResources, resourceName } = this.props;
     const visibleColumns = this.columnObjToArr() ? this.columnObjToArr() : [];
     const loader = () => parentResources[resourceName] ? parentResources[resourceName].isPending : false;
-    console.log(TableData);
+    const contentData = this.props.contentData !== null ? this.props.contentData : [];
     return (
       
       <Pane id="pane-viewtransactions" defaultWidth={this.props.paneWidth} paneTitle="Transaction's View" dismissible onClose={this.props.onClose}>
@@ -102,8 +100,7 @@ class TableSortAndFilter extends Component {
                 virtualize
                 interactive={false}
                 id={`list-TableAndSortFilter`}
-                // contentData={this.isData()}
-                contentData={TableData}
+                contentData={contentData}
                 formatter={this.props.formatter}
                 // selectedRow={this.state.selectedRow}
                 onRowClick={this.onSelectRow}
@@ -128,12 +125,12 @@ class TableSortAndFilter extends Component {
     )
   }
 
-  isData = () => {
-    const { parentResources, resourceName } = this.props;
-    const data = (parentResources[resourceName] || {}).records || [];
-    if (!data || data.length === 0) return [];
-    return data;
-  }
+  // isData = () => {
+  //   const { parentResources, resourceName } = this.props;
+  //   const data = (parentResources[resourceName] || {}).records || [];
+  //   if (!data || data.length === 0) return [];
+  //   return data;
+  // }
 
   resetColumn() {
     const defaultConfig = _.cloneDeep(this.props.visibleColumnsConfig);
@@ -263,7 +260,8 @@ class TableSortAndFilter extends Component {
       this.setState({ filters: loopFilters, showClearButton: false });
     }
    
-    this.createFilterQuery(loopFilters);
+    this.props.onUpdateFilter(loopFilters);
+    // this.createFilterQuery(loopFilters);
   }
   
   createFilterQuery() {
@@ -319,7 +317,8 @@ class TableSortAndFilter extends Component {
       visibleColumns: this.resetColumn(),
       showClearButton: false
     }, function() {
-      this.createFilterQuery();
+      this.props.onUpdateFilter();
+      // this.createFilterQuery();
     });
   }
 

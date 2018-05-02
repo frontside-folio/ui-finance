@@ -18,6 +18,7 @@ import craftLayerUrl from '@folio/stripes-components/util/craftLayerUrl';
 import BudgetPane from './BudgetPane';
 import transitionToParams from '@folio/stripes-components/util/transitionToParams';
 import TableSortAndFilter from '../TableSortAndFilter';
+import TableData from '../../Utils/TableData';
 
 
 class BudgetView extends Component {
@@ -33,7 +34,8 @@ class BudgetView extends Component {
     this.state = {
       viewID: '',
       fundID: null,
-      fyID: null
+      fyID: null,
+      TableData:TableData
     };
     this.getData = this.getData.bind(this);
     this.getFiscalYears = this.getFiscalYears.bind(this);
@@ -44,7 +46,12 @@ class BudgetView extends Component {
     this.craftLayerUrl = craftLayerUrl.bind(this);
     this.transitionToParams = transitionToParams.bind(this);
     this.openTransactionLayer = this.openTransactionLayer.bind(this);
-    
+    this.onUpdateFilter = this.onUpdateFilter.bind(this);
+    this.loopThroughFilter = this.loopThroughFilter.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ TableData });
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -92,7 +99,7 @@ class BudgetView extends Component {
         buttonStyle="primary paneHeaderNewButton"
         marginBottom0
       >
-        Transctions
+        Transactions
       </Button>
       <IfPermission perm="budget.item.put">
         <IconButton
@@ -108,13 +115,15 @@ class BudgetView extends Component {
     // Table Sort Filter Config
     const filterConfig = [
       {
-        label: 'Vendor Status',
-        name: 'vendor_status',
-        cql: 'vendor_status',
+        label: 'Transaction Type',
+        name: 'transaction_type',
+        cql: 'transaction_type',
         values: [
-          { name: 'active', cql: false },
-          { name: 'inactive', cql: false },
-          { name: 'pending', cql: false },
+          {name: "PO-Line-Encumbrance", cql: false},
+          {name: "Payment", cql: false},
+          {name: "allocation", cql: false},
+          {name: "Transfer", cql: false},
+          {name: "credit", cql: false},
         ]
       }
     ];
@@ -191,6 +200,7 @@ class BudgetView extends Component {
             filterConfig={filterConfig}
             onClose={this.onCloseTransaction}
             visibleColumnsConfig={visibleColumnsConfig}
+            contentData={this.state.TableData}
             // formatter={formatter}
             columnMapping={columnMapping}
             onUpdateFilter={this.onUpdateFilter}
@@ -239,6 +249,11 @@ class BudgetView extends Component {
     this.props.parentMutator.records.PUT(data).then(() => {
       this.props.onCloseEdit();
     });
+  }
+  
+  onUpdateFilter(data) {
+    const { parentMutator } = this.props;
+    parentMutator.tableQuery.update({ filter:data });
   }
 
   openTransactionLayer() {
