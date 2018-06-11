@@ -71,7 +71,7 @@ class FundPane extends Component {
     return (
       <form id="form-fund">
         <Pane defaultWidth="100%" firstMenu={firstMenu} lastMenu={lastMenu} paneTitle={paneTitle}>
-          <FundForm {...this.props} {...this.props} deleteFund={this.deleteFund} />
+          <FundForm {...this.props} deleteFund={this.deleteFund} />
         </Pane>
       </form>
     )
